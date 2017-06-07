@@ -70,7 +70,7 @@ class Mangiamusica extends Component {
     super(props);
 
     this.state = {
-      text: '"[SCAN QR CODE TO PLAY MUSIC]',
+      text: '[SCAN QR CODE TO PLAY MUSIC]',
       song: ''
     }
   }
@@ -83,7 +83,7 @@ class Mangiamusica extends Component {
           }}
           onBarCodeRead={(e) => {
             this.setState({
-              text: 'I\'m going to play ' + e.data,
+              text: 'I\'m going to play ' + e.data + ' tap to stop',
               song: e.data
             })
 
@@ -98,7 +98,9 @@ class Mangiamusica extends Component {
           }}
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill}>
-          <Text style={styles.capture}>{this.state.text}</Text>
+          <Text style={styles.capture} onPress={() =>{
+            karma.pause();
+          }}>{this.state.text}</Text>
         </Camera>
       </View>
     );
