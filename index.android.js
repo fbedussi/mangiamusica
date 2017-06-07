@@ -13,16 +13,7 @@ import {
 import Camera from 'react-native-camera';
 import Sound from 'react-native-sound';
 
-// Load the sound file 'whoosh.mp3' from the app bundle
-// See notes below about preloading sounds within initialization code below.
-var karma = new Sound('karma.mp3', Sound.MAIN_BUNDLE, (error) => {
-  if (error) {
-    console.log('failed to load the sound', error);
-    return;
-  } 
-  // loaded successfully
-  console.log('duration in seconds: ' + karma.getDuration() + 'number of channels: ' + karma.getNumberOfChannels());
-});
+
 
 
 
@@ -71,9 +62,20 @@ class Mangiamusica extends Component {
 
     this.state = {
       text: '[SCAN QR CODE TO PLAY MUSIC]',
-      song: ''
+      title: '',
+      song: null
     }
   }
+
+  stopPlaying() {
+    this.state.song.stop();
+    this.setState({
+        text: '[SCAN QR CODE TO PLAY MUSIC]',
+        title: '',
+        song: null
+    })
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -82,24 +84,48 @@ class Mangiamusica extends Component {
             this.camera = cam;
           }}
           onBarCodeRead={(e) => {
+            if (e.data === this.state.title) {
+              return;
+            }
+
+            if (this.state.song !== null) {
+              this.stopPlaying();
+            }
+
+
             this.setState({
               text: 'I\'m going to play ' + e.data + ' tap to stop',
-              song: e.data
+              title: e.data
             })
 
-            // Play the sound with an onEnd callback
-            karma.play((success) => {
-              if (success) {
-                console.log('successfully finished playing');
-              } else {
-                console.log('playback failed due to audio decoding errors');
-              }
+            var song = new Sound(e.data, Sound.MAIN_BUNDLE, (error) => {
+              if (error) {
+                console.log('failed to load the song ' + e.data, error);
+                return;
+              } 
+              
+              console.log('duration in seconds: ' + song.getDuration() + 'number of channels: ' + song.getNumberOfChannels());
+
+               song.play((success) => {
+                if (success) {
+                  console.log('successfully finished playing');
+                } else {
+                  console.log('playback failed due to audio decoding errors');
+                }
+              });
             });
+
+           
+
+
+            this.setState({
+              song
+            })            
           }}
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill}>
           <Text style={styles.capture} onPress={() =>{
-            karma.pause();
+            this.stopPlaying();
           }}>{this.state.text}</Text>
         </Camera>
       </View>
