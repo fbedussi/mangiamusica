@@ -62,7 +62,7 @@ class Mangiamusica extends Component {
 
     this.state = {
       text: '[SCAN QR CODE TO PLAY MUSIC]',
-      title: '',
+      file: '',
       song: null
     }
   }
@@ -71,7 +71,7 @@ class Mangiamusica extends Component {
     this.state.song.stop();
     this.setState({
         text: '[SCAN QR CODE TO PLAY MUSIC]',
-        title: '',
+        file: '',
         song: null
     })
   }
@@ -84,7 +84,7 @@ class Mangiamusica extends Component {
             this.camera = cam;
           }}
           onBarCodeRead={(e) => {
-            if (e.data === this.state.title) {
+            if (e.data === this.state.file) {
               return;
             }
 
@@ -95,7 +95,7 @@ class Mangiamusica extends Component {
 
             this.setState({
               text: 'I\'m going to play ' + e.data + ' tap to stop',
-              title: e.data
+              file: e.data
             })
 
             var song = new Sound(e.data, Sound.MAIN_BUNDLE, (error) => {
@@ -115,8 +115,6 @@ class Mangiamusica extends Component {
               });
             });
 
-           
-
 
             this.setState({
               song
@@ -124,6 +122,7 @@ class Mangiamusica extends Component {
           }}
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill}>
+          <View style={this.state.song ? styles.overlay : {}}/>
           <Text style={styles.capture} onPress={() =>{
             this.stopPlaying();
           }}>{this.state.text}</Text>
@@ -132,6 +131,7 @@ class Mangiamusica extends Component {
     );
   }
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -149,8 +149,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     color: '#000',
     padding: 10,
+    position: relative,
     margin: 40
+  },
+  overlay: {
+     position: 'absolute',
+     top: 0,
+     left: 0,
+     width: '100%',
+     height: '100%',
+     opacity: 0.5,
+     backgroundColor: '#ffffff'
   }
 });
+
+
 
 AppRegistry.registerComponent('mangiamusica', () => Mangiamusica);
